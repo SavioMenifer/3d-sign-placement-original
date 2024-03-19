@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <title>3D Sign Placement</title>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="street-view"></div>
+    <div id="overlay">
+      <input id="rotation-slider" type="range" min="0" max="360" value="180" />
+    </div>
+    <script type="module" src="./script.js"></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC14LoTFTwCL4Yhssay4NletWLfIAMYXBs&callback=initialize&v=weekly"
+      defer
+    ></script>
+  </body>
+</html>
