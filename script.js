@@ -38,6 +38,9 @@ function initialize() {
 
   map.setStreetView(panorama);
   panorama.addListener("pov_changed", updateScene);
+  panorama.addListener("position_changed", () => {
+    map.panTo(panorama.getPosition());
+  });
 
   class CanvasOverlay extends google.maps.OverlayView {
     constructor() {
@@ -152,6 +155,7 @@ const dragControls = new DragControls(
   renderer.domElement
 );
 dragControls.transformGroup = true;
+dragControls.addEventListener("dragstart", onDragStart);
 dragControls.addEventListener("drag", onDragEvent);
 dragControls.addEventListener("hoveron", function () {
   panoCanvas.parentNode.parentNode.insertBefore(
@@ -188,6 +192,7 @@ function updateScene() {
     "ar:" + camera.aspect + " z:" + panorama.zoom + " fov:" + camera.fov
   );
   */
+
   camera.updateProjectionMatrix();
   renderer?.render(scene, camera);
 }
@@ -212,11 +217,23 @@ var dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 var raycaster = new THREE.Raycaster();
 var intersects = new THREE.Vector3();
 
+var planeNormal = new THREE.Vector3(0, 1, 0);
+var dragOffset = new THREE.Vector3();
+var intersectPoint = new THREE.Vector3();
+var box = new THREE.Box3();
+
+function onDragStart(e) {
+  box.setFromObject(e.object);
+  raycaster.setFromCamera(mouse, camera);
+  raycaster.ray.intersectBox(box, intersectPoint);
+  dragPlane.setFromNormalAndCoplanarPoint(planeNormal, intersectPoint);
+  dragOffset.subVectors(e.object.position, intersectPoint);
+}
+
 function onDragEvent(e) {
   raycaster.setFromCamera(mouse, camera);
   raycaster.ray.intersectPlane(dragPlane, intersects);
-  e.object.position.set(intersects.x, 0, intersects.z);
-  //console.log(e.object.position);
+  e.object.position.copy(intersects).add(dragOffset);
   renderer?.render(scene, camera);
 }
 
