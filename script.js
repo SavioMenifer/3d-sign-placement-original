@@ -155,7 +155,7 @@ const dragControls = new DragControls(
   renderer.domElement
 );
 dragControls.transformGroup = true;
-dragControls.addEventListener("dragstart", onDragStart);
+//dragControls.addEventListener("dragstart", onDragStart);
 dragControls.addEventListener("drag", onDragEvent);
 dragControls.addEventListener("hoveron", function () {
   panoCanvas.parentNode.parentNode.insertBefore(
@@ -231,20 +231,46 @@ function onDragStart(e) {
 }
 
 function onDragEvent(e) {
+  /*
   raycaster.setFromCamera(mouse, camera);
   raycaster.ray.intersectPlane(dragPlane, intersects);
   e.object.position.copy(intersects).add(dragOffset);
+  */
+
   renderer?.render(scene, camera);
+  const newpos = new THREE.Vector3(e.object.position.x, 0, e.object.position.z);
+  e.object.position.copy(newpos);
+  renderer?.render(scene, camera);
+  console.log(group.position);
 }
 
 function initSlider() {
   const slider = document.getElementById("rotation-slider");
   slider.addEventListener("input", rotateSign);
   rotateSign();
+  const depthslider = document.getElementById("depth-slider");
+  depthslider.addEventListener("input", depthSign);
+  //depthSign();
 }
 
 function rotateSign() {
   const slider = document.getElementById("rotation-slider");
   sign.rotation.y = (slider.value * Math.PI) / 180;
+  renderer?.render(scene, camera);
+}
+
+function depthSign() {
+  const slider = document.getElementById("depth-slider");
+
+  const direction = new THREE.Vector3();
+  camera.getWorldDirection(direction);
+  direction.normalize();
+
+  const newPosition = direction
+    .multiplyScalar(slider.value)
+    .multiply(new THREE.Vector3(1, 0, 1));
+  group.position.copy(newPosition);
+
+  //console.log(group.position);
   renderer?.render(scene, camera);
 }
